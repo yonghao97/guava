@@ -13,18 +13,36 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface RangeMultiMap<K extends Comparable, V> {
 
     /**
-     * Returns the number of key-value pairs in this multimap.
-     *
-     * <p><b>Note:</b> this method does not return the number of <i>distinct keys</i> in the multimap,
-     * which is given by {@code keySet().size()} or {@code asMap().size()}. See the opening section of
-     * the {@link Multimap} class documentation for clarification.
+     * Returns the number of key-value pairs in this RangeMultimap.
      */
     int size();
+
+    /**
+     * Returns {@code true} if this RangeMultimap contains no key-value pairs. Equivalent to {@code size()
+     * == 0}, but can in some cases be more efficient.
+     */
     boolean isEmpty();
 
+    /**
+     * Returns the minimal range {@linkplain Range#encloses(Range) enclosing} the ranges in this
+     * {@code RangeMultiMap}.
+     *
+     * @throws NoSuchElementException if this RangeMulti map is empty
+     */
     Range<K> span();
+
+    /**
+     * Stores a key-value pair in this range multi map.
+     *
+     * <p>Some multimap implementations allow duplicate key-value pairs, in which case {@code put}
+     * always adds a new key-value pair and increases the multimap size by 1. Other implementations
+     * prohibit duplicates, and storing a key-value pair that's already in the multimap has no effect.
+     *
+     * @return {@code true} if the method increased the size of the multimap, or {@code false} if the
+     *     RangeMultimap already contained the key-value pair and doesn't allow duplicates
+     */
     @CheckForNull
-    void put(Range<K> range, V value);
+    boolean put(Range<K> range, V value);
 
     void putAll(Range<K> range, Iterable<? extends V> values);
 
