@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.common.collect;
 
+package com.google.common.collect;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -22,6 +22,8 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import javax.annotation.CheckForNull;
+
+import com.google.common.collect.ElementTypesAreNonnullByDefault;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -33,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @author Yonghao Lu
  * */
+
 @ElementTypesAreNonnullByDefault
 public interface RangeMultiMap<K extends Comparable, V> {
 
@@ -83,6 +86,16 @@ public interface RangeMultiMap<K extends Comparable, V> {
      * @return {@code true} if the multimap changed
      */
     boolean putAll(Range<K> range, Iterable<? extends V> values);
+
+
+    /**
+     * Returns the values associated with the specified key in a range, or {@code null} if there is no such value.
+     *
+     * <p>Specifically, if any range in this range map contains the specified key, the value
+     * associated with that range is returned.
+     */
+    @CheckForNull
+    Collection<V> get(K key);
 
     /**
      * Returns a view collection of the values associated with {@code range} in this RangeMultimap, if any.
