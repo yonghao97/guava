@@ -165,22 +165,55 @@ public class ImmutableRangeMultiMap<K extends Comparable<?>, V> implements Range
         this.values = values;
     }
 
+    // Requested Method
+
+    /**
+     *
+     * Method receives a key {@code K} as an input and outputs a collection of values {@code V} that the ranges produce
+     * @author Rajin Hossain
+     *
+    */
     @Override
     @CheckForNull
-    public V get(K key) {
-        int index =
-                SortedLists.binarySearch(
-                        ranges,
-                        Range.<K>lowerBoundFn(),
-                        Cut.belowValue(key),
-                        KeyPresentBehavior.ANY_PRESENT,
-                        KeyAbsentBehavior.NEXT_LOWER);
-        if (index == -1) {
-            return null;
-        } else {
-            Range<K> range = ranges.get(index);
-            return range.contains(key) ? values.get(index) : null;
+    public Collection<V> get(K key) {
+
+        List<V> retrievedValues = new ArrayList<>();
+
+        // iterate through all the ranges and find the valid ranges
+        // from these ranges pick out their corresponding values
+        for (int i = 0; i < ranges.size(); i++) {
+            if (ranges.get(i).contains(key)) {
+                retrievedValues.add(values.get(i));
+            }
         }
+
+        return retrievedValues.size() > 0 ? retrievedValues : null;
+    }
+
+
+    // Requested Method
+
+    /**
+     *
+     * Method receives a range of keys {@code K} as an input and outputs a collection of values {@code V} that the ranges produce
+     * @author Rajin Hossain
+     *
+     */
+    @Override
+    @CheckForNull
+    public Collection<V> get(Range<K> range) {
+
+        List<V> retrievedValues = new ArrayList<>();
+
+        // iterate through all the ranges and find which ones encloses the input range
+        // from these ranges pick out their corresponding values
+        for (int i = 0; i < ranges.size(); i++) {
+            if (ranges.get(i).encloses(range)) {
+                retrievedValues.add(values.get(i));
+            }
+        }
+
+        return retrievedValues.size() > 0 ? retrievedValues : null;
     }
 
     @Override
@@ -190,7 +223,7 @@ public class ImmutableRangeMultiMap<K extends Comparable<?>, V> implements Range
                 SortedLists.binarySearch(
                         ranges,
                         Range.<K>lowerBoundFn(),
-                        Cut.belowValue(key),
+                        Cut.belowValue(range.lowerBound),
                         KeyPresentBehavior.ANY_PRESENT,
                         KeyAbsentBehavior.NEXT_LOWER);
         if (index == -1) {
@@ -200,6 +233,8 @@ public class ImmutableRangeMultiMap<K extends Comparable<?>, V> implements Range
             return range.contains(key) ? Maps.immutableEntry(range, values.get(index)) : null;
         }
     }
+
+
 
     @Override
     public Range<K> span() {
@@ -212,7 +247,7 @@ public class ImmutableRangeMultiMap<K extends Comparable<?>, V> implements Range
     }
 
     /**
-     * Guaranteed to throw an exception and leave the {@code RangeMultiMap} unmodified.
+     * Guaranteed to throw an exception and leave the {@code RangeultiMap} unmodified.
      *
      * @throws UnsupportedOperationException always
      * @deprecated Unsupported operation.
