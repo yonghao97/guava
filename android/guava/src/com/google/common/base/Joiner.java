@@ -297,6 +297,42 @@ public class Joiner {
   }
 
   /**
+   * Returns a joiner with the same behavior as this joiner, except it will truncate at specified list length
+   */
+  public Joiner tuncateBy(int maxLength, String truncationIndicator) {
+    return new Joiner(this) {
+      @Override
+      public <A extends Appendable> A appendTo(
+              A appendable, Iterator<? extends @Nullable Object> parts) throws IOException {
+        checkNotNull(appendable, "appendable");
+        checkNotNull(parts, "parts");
+
+        int counter = 0;
+        while (parts.hasNext() && counter < maxLength) {
+          Object part = parts.next();
+          counter++;
+          if (part != null) {
+            appendable.append(separator);
+            appendable.append(Joiner.this.toString(part));
+          }
+        }
+        if (counter == maxLength) appendable.append(truncationIndicator);
+        return appendable;
+      }
+
+      @Override
+      public Joiner skipNulls() {
+        throw new UnsupportedOperationException("can't use .truncateBy() with skipNulls");
+      }
+
+      @Override
+      public MapJoiner withKeyValueSeparator(String kvs) {
+        throw new UnsupportedOperationException("can't use .truncateBy() with maps");
+      }
+    };
+  }
+
+  /**
    * Returns a {@code MapJoiner} using the given key-value separator, and the same configuration as
    * this {@code Joiner} otherwise.
    *
